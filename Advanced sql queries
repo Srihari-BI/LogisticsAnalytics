@@ -1,0 +1,146 @@
+-- Query 1: Calculate cumulative revenue per month for each product
+SELECT 
+    p.product_id,
+    p.product_name,
+    DATE_TRUNC('month', o.order_date) AS month,
+    SUM(o.quantity * p.price) OVER(PARTITION BY p.product_id ORDER BY DATE_TRUNC('month', o.order_date)) AS cumulative_revenue
+FROM 
+    Products p
+JOIN 
+    Orders o ON p.product_id = o.product_id
+ORDER BY 
+    p.product_id, month;
+
+-- Query 2: Identify top 10 customers based on total spending
+SELECT 
+    c.customer_id,
+    c.customer_name,
+    SUM(o.quantity * p.price) AS total_spent
+FROM 
+    Customers c
+JOIN 
+    Orders o ON c.customer_id = o.customer_id
+JOIN 
+    Products p ON o.product_id = p.product_id
+GROUP BY 
+    c.customer_id, c.customer_name
+ORDER BY 
+    total_spent DESC
+LIMIT 10;
+
+-- Query 3: Calculate average order value per customer segment
+SELECT 
+    s.segment_name,
+    AVG(o.quantity * p.price) AS avg_order_value
+FROM 
+    CustomerSegments s
+JOIN 
+    Customers c ON s.segment_id = c.segment_id
+JOIN 
+    Orders o ON c.customer_id = o.customer_id
+JOIN 
+    Products p ON o.product_id = p.product_id
+GROUP BY 
+    s.segment_name;
+
+-- Query 4: Determine product affinity based on co-purchases
+SELECT 
+    p1.product_name AS product_a,
+    p2.product_name AS product_b,
+    COUNT(*) AS co_purchase_count
+FROM 
+    Orders o1
+JOIN 
+    Orders o2 ON o1.order_id = o2.order_id AND o1.product_id < o2.product_id
+JOIN 
+    Products p1 ON o1.product_id = p1.product_id
+JOIN 
+    Products p2 ON o2.product_id = p2.product_id
+GROUP BY 
+    p1.product_name, p2.product_name
+ORDER BY 
+    co_purchase_count DESC;
+
+-- Query 5: Calculate moving average of order quantities over a rolling 3-month period
+SELECT 
+    o.order_id,
+    o.order_date,
+    o.quantity,
+    AVG(o.quantity) OVER(ORDER BY o.order_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg_quantity
+FROM 
+    Orders o
+ORDER BY 
+    o.order_date;
+
+-- Query 6: Identify customers with decreasing spending trend
+WITH customer_spend_trend AS (
+    SELECT 
+        c.customer_id,
+        c.customer_name,
+        DATE_TRUNC('month', o.order_date) AS month,
+        SUM(o.quantity * p.price) AS monthly_spending,
+        LAG(SUM(o.quantity * p.price)) OVER(PARTITION BY c.customer_id ORDER BY DATE_TRUNC('month', o.order_date)) AS previous_month_spending
+    FROM 
+        Customers c
+    JOIN 
+        Orders o ON c.customer_id = o.customer_id
+    JOIN 
+        Products p ON o.product_id = p.product_id
+    GROUP BY 
+        c.customer_id, c.customer_name, month
+)
+SELECT 
+    customer_id,
+    customer_name,
+    month
+FROM 
+    customer_spend_trend
+WHERE 
+    monthly_spending < previous_month_spending;
+
+-- Query 7: Calculate retention rate over a 6-month period
+SELECT 
+    DATE_TRUNC('month', order_date) AS month,
+    COUNT(DISTINCT customer_id) AS total_customers,
+    COUNT(DISTINCT CASE WHEN EXTRACT(month FROM order_date) = EXTRACT(month FROM CURRENT_DATE) - 6 THEN customer_id END) AS retained_customers,
+    (COUNT(DISTINCT CASE WHEN EXTRACT(month FROM order_date) = EXTRACT(month FROM CURRENT_DATE) - 6 THEN customer_id END) / COUNT(DISTINCT customer_id)) * 100 AS retention_rate
+FROM 
+    Orders
+GROUP BY 
+    month
+ORDER BY 
+    month;
+
+-- Query 8: Calculate cumulative revenue per product category
+SELECT 
+    p.category,
+    p.product_name,
+    o.order_date,
+    SUM(o.quantity * p.price) OVER(PARTITION BY p.category ORDER BY o.order_date) AS cumulative_revenue
+FROM 
+    Products p
+JOIN 
+    Orders o ON p.product_id = o.product_id;
+
+-- Query 9: Identify seasonal trends in sales based on monthly revenue
+SELECT 
+    DATE_TRUNC('month', order_date) AS month,
+    SUM(quantity * price) AS monthly_revenue
+FROM 
+    Orders
+GROUP BY 
+    month
+ORDER BY 
+    month;
+
+-- Query 10: Calculate contribution margin ratio for each product
+SELECT 
+    p.product_id,
+    p.product_name,
+    (SUM(o.quantity * p.price) - SUM(o.quantity * p.cost)) / SUM(o.quantity * p.price) AS contribution_margin_ratio
+FROM 
+    Products p
+JOIN 
+    Orders o ON p.product_id = o.product_id
+GROUP BY 
+    p.product_id, p.product_name;
