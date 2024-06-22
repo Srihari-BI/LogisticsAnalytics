@@ -1,0 +1,131 @@
+CREATE TABLE Warehouses (
+    warehouse_id INT PRIMARY KEY,
+    warehouse_name VARCHAR(255),
+    location VARCHAR(255),
+    capacity DECIMAL(10, 2)
+);
+
+-- Example INSERT statements
+INSERT INTO Warehouses (warehouse_id, warehouse_name, location, capacity)
+VALUES
+    (1, 'Warehouse A', 'New York', 10000.00),
+    (2, 'Warehouse B', 'Los Angeles', 15000.00),
+    (3, 'Warehouse C', 'Chicago', 12000.00),
+    (4, 'Warehouse D', 'Houston', 8000.00),
+    (5, 'Warehouse E', 'Miami', 9000.00),
+    (6, 'Warehouse F', 'Seattle', 11000.00),
+    (7, 'Warehouse G', 'Atlanta', 13000.00),
+    (8, 'Warehouse H', 'Dallas', 10000.00),
+    (9, 'Warehouse I', 'San Francisco', 14000.00),
+    (10, 'Warehouse J', 'Boston', 9500.00),
+    (11, 'Warehouse K', 'Denver', 11500.00),
+    (12, 'Warehouse L', 'Phoenix', 12500.00),
+    (13, 'Warehouse M', 'Detroit', 7000.00),
+    (14, 'Warehouse N', 'Minneapolis', 10500.00),
+    (15, 'Warehouse O', 'Philadelphia', 13500.00),
+    (16, 'Warehouse P', 'Washington, D.C.', 12500.00),
+    (17, 'Warehouse Q', 'Las Vegas', 10000.00),
+    (18, 'Warehouse R', 'Portland', 11000.00),
+    (19, 'Warehouse S', 'Salt Lake City', 9500.00),
+    (20, 'Warehouse T', 'Charlotte', 12000.00);
+
+CREATE TABLE Products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(255),
+    category VARCHAR(100),
+    price DECIMAL(10, 2)
+);
+
+-- Example INSERT statements
+INSERT INTO Products (product_id, product_name, category, price)
+VALUES
+    (1, 'Laptop', 'Electronics', 1200.00),
+    (2, 'Printer', 'Electronics', 350.00),
+    (3, 'Chair', 'Furniture', 150.00),
+    (4, 'Desk', 'Furniture', 300.00),
+    (5, 'Smartphone', 'Electronics', 800.00),
+    (6, 'Tablet', 'Electronics', 500.00),
+    (7, 'Sofa', 'Furniture', 700.00),
+    (8, 'Monitor', 'Electronics', 250.00),
+    (9, 'Bookshelf', 'Furniture', 200.00),
+    (10, 'Headphones', 'Electronics', 100.00),
+    (11, 'Dining Table', 'Furniture', 400.00),
+    (12, 'TV', 'Electronics', 1000.00),
+    (13, 'Bed', 'Furniture', 600.00),
+    (14, 'Microwave', 'Appliances', 150.00),
+    (15, 'Washing Machine', 'Appliances', 700.00),
+    (16, 'Refrigerator', 'Appliances', 800.00),
+    (17, 'Oven', 'Appliances', 400.00),
+    (18, 'Vacuum Cleaner', 'Appliances', 300.00),
+    (19, 'Toaster', 'Appliances', 50.00),
+    (20, 'Coffee Maker', 'Appliances', 80.00);
+
+
+CREATE TABLE Shipments (
+    shipment_id INT PRIMARY KEY,
+    product_id INT,
+    warehouse_id INT,
+    quantity INT,
+    shipment_date DATE,
+    FOREIGN KEY (product_id) REFERENCES Products(product_id),
+    FOREIGN KEY (warehouse_id) REFERENCES Warehouses(warehouse_id)
+);
+
+-- Example INSERT statements
+INSERT INTO Shipments (shipment_id, product_id, warehouse_id, quantity, shipment_date)
+VALUES
+    (1, 1, 1, 50, '2024-06-01'),
+    (2, 2, 2, 30, '2024-06-02'),
+    (3, 3, 1, 100, '2024-06-03'),
+    (4, 4, 3, 20, '2024-06-04'),
+    (5, 5, 2, 40, '2024-06-05'),
+    (6, 6, 4, 60, '2024-06-06'),
+    (7, 7, 5, 10, '2024-06-07'),
+    (8, 8, 6, 25, '2024-06-08'),
+    (9, 9, 7, 15, '2024-06-09'),
+    (10, 10, 8, 35, '2024-06-10'),
+    (11, 11, 9, 45, '2024-06-11'),
+    (12, 12, 10, 55, '2024-06-12'),
+    (13, 13, 11, 5, '2024-06-13'),
+    (14, 14, 12, 70, '2024-06-14'),
+    (15, 15, 13, 80, '2024-06-15'),
+    (16, 16, 14, 90, '2024-06-16'),
+    (17, 17, 15, 30, '2024-06-17'),
+    (18, 18, 16, 25, '2024-06-18'),
+    (19, 19, 17, 15, '2024-06-19'),
+    (20, 20, 18, 10, '2024-06-20');
+
+
+CREATE TABLE Orders (
+    order_id INT PRIMARY KEY,
+    product_id INT,
+    customer_name VARCHAR(255),
+    order_date DATE,
+    quantity INT,
+    shipping_address VARCHAR(500),
+    FOREIGN KEY (product_id) REFERENCES Products(product_id)
+);
+
+-- Example INSERT statements
+INSERT INTO Orders (order_id, product_id, customer_name, order_date, quantity, shipping_address)
+VALUES
+    (1, 1, 'John Doe', '2024-06-01', 5, '123 Main St, Anytown'),
+    (2, 2, 'Jane Smith', '2024-06-02', 2, '456 Elm St, Another Town'),
+    (3, 3, 'Michael Johnson', '2024-06-03', 10, '789 Oak St, Smalltown'),
+    (4, 4, 'Emily Brown', '2024-06-04', 3, '987 Pine St, Bigcity'),
+    (5, 5, 'David Lee', '2024-06-05', 8, '654 Maple St, Hometown'),
+    (6, 6, 'Sarah Taylor', '2024-06-06', 12, '321 Cedar St, Villagetown'),
+    (7, 7, 'Chris Wilson', '2024-06-07', 15, '876 Birch St, Suburbia'),
+    (8, 8, 'Jessica Garcia', '2024-06-08', 20, '234 Willow St, Metrocity'),
+    (9, 9, 'Mark Robinson', '2024-06-09', 7, '789 Elm St, Downtown'),
+    (10, 10, 'Lisa Martinez', '2024-06-10', 4, '432 Oak St, Riverside'),
+    (11, 11, 'Kevin Adams', '2024-06-11', 6, '876 Pine St, Uptown'),
+    (12, 12, 'Nicole Clark', '2024-06-12', 9, '123 Maple St, Outskirts'),
+    (13, 13, 'Andrew Scott', '2024-06-13', 11, '567 Cedar St, Lakeside'),
+    (14, 14, 'Michelle Thomas', '2024-06-14', 14, '345 Birch St, Countryside'),
+    (15, 15, 'Ryan Hall', '2024-06-15', 18, '789 Willow St, Mountainside'),
+    (16, 16, 'Emma White', '2024-06-16', 22, '234 Cedar St, Seaside'),
+    (17, 17, 'Daniel Harris', '2024-06-17', 25, '987 Birch St, Valleytown'),
+    (18, 18, 'Laura Miller', '2024-06-18', 30, '654 Willow St, Island'),
+    (19, 19, 'Steven Young', '2024-06-19', 16, '432 Pine St, Peninsula'),
+    (20, 20, 'Amanda King', '2024-06-20', 19, '876 Oak St, Bayview');
