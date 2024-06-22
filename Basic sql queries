@@ -1,0 +1,60 @@
+-- Query 1: Retrieve all shipments along with product details and warehouse location
+SELECT s.shipment_id, p.product_name, p.price, s.quantity, w.location
+FROM Shipments s
+INNER JOIN Products p ON s.product_id = p.product_id
+INNER JOIN Warehouses w ON s.warehouse_id = w.warehouse_id;
+
+-- Query 2: Calculate total revenue generated from each order
+SELECT o.order_id, SUM(p.price * o.quantity) AS total_revenue
+FROM Orders o
+INNER JOIN Products p ON o.product_id = p.product_id
+GROUP BY o.order_id;
+
+-- Query 3: Identify warehouses with the highest and lowest capacity
+SELECT MAX(capacity) AS max_capacity, MIN(capacity) AS min_capacity
+FROM Warehouses;
+
+-- Query 4: List products with the highest and lowest prices
+SELECT MAX(price) AS max_price_product, MIN(price) AS min_price_product
+FROM Products;
+
+-- Query 5: Calculate average quantity of products per shipment
+SELECT AVG(quantity) AS avg_quantity_per_shipment
+FROM Shipments;
+
+-- Query 6: Retrieve orders placed by a specific customer with order details
+SELECT o.order_id, o.order_date, p.product_name, o.quantity
+FROM Orders o
+INNER JOIN Products p ON o.product_id = p.product_id
+WHERE o.customer_id = 1;
+
+-- Query 7: Identify warehouses with available capacity for new shipments
+SELECT w.warehouse_id, w.warehouse_name, w.capacity - SUM(s.quantity) AS available_capacity
+FROM Warehouses w
+LEFT JOIN Shipments s ON w.warehouse_id = s.warehouse_id
+GROUP BY w.warehouse_id
+HAVING available_capacity > 0;
+
+-- Query 8: Calculate total revenue generated per warehouse location
+SELECT w.location, SUM(p.price * s.quantity) AS total_revenue
+FROM Shipments s
+INNER JOIN Products p ON s.product_id = p.product_id
+INNER JOIN Warehouses w ON s.warehouse_id = w.warehouse_id
+GROUP BY w.location;
+
+-- Query 9: Determine the top 5 best-selling products by quantity
+SELECT p.product_name, SUM(o.quantity) AS total_quantity_sold
+FROM Orders o
+INNER JOIN Products p ON o.product_id = p.product_id
+GROUP BY p.product_name
+ORDER BY total_quantity_sold DESC
+LIMIT 5;
+
+-- Query 10: Calculate average revenue per order and total orders placed
+SELECT COUNT(*) AS total_orders, AVG(total_revenue) AS avg_revenue_per_order
+FROM (
+    SELECT o.order_id, SUM(p.price * o.quantity) AS total_revenue
+    FROM Orders o
+    INNER JOIN Products p ON o.product_id = p.product_id
+    GROUP BY o.order_id
+) AS order_revenues;
